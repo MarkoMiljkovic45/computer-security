@@ -10,6 +10,7 @@ target/
 *.bin
 
 !diskusija.txt
+!opis-sustava.txt
 
 ### IntelliJ IDEA ###
 .idea

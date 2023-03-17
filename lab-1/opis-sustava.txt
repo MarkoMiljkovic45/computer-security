@@ -1,0 +1,14 @@
+Prilikom prvog pokretanja aplikacije od korisnika se traži da inicijalizira glavnu zaporku
+
+Inače aplikacija se ponaša poput sučelja u komandnoj liniji koje razumije 3 naredbe:
+
+    get [master-password] [web-addres]            - Vraća lozinku spremljenu za zadanu web-adresu
+    put [master-password] [web-addres] [password] - Postavlja password za zadanu web-adresu
+    quit                                          - Zatvara aplikaciju
+
+
+# Dodati opis enkripcije koji pokriva sve sigurnosne zahtijeve #
+
+# Obratite pažnju i dokumentirajte postupke generiranja ključeva odnosno deriviranja ključeva iz zaporke. #
+
+TODO
