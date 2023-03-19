@@ -1,4 +1,4 @@
-package hr.fer.zemris.java.hw06.shell.env;
+package hr.fer.srs.env;
 
 /**
  * Signals current ShellEnvironment status

@@ -1,4 +1,4 @@
-package hr.fer.zemris.java.hw06.shell.env;
+package hr.fer.srs.env;
 
 /**
  * This exception is thrown if there is an exception when reading from or writing to the shell environment.

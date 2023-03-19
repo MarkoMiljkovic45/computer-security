@@ -1,6 +1,6 @@
-package hr.fer.zemris.java.hw06.shell.env;
+package hr.fer.srs.env;
 
-import hr.fer.zemris.java.hw06.shell.commands.ShellCommand;
+import hr.fer.srs.commands.ShellCommand;
 
 import java.util.SortedMap;
 
@@ -42,20 +42,6 @@ public interface Environment {
     SortedMap<String, ShellCommand> commands();
 
     /**
-     * This character is used to denote that a command will span across multiple lines
-     *
-     * @return The MULTILINE character
-     */
-    Character getMultilineSymbol();
-
-    /**
-     * Used to set the MULTILINESYMBOL character
-     *
-     * @param symbol The new MULTILINESYMBOL character
-     */
-    void setMultilineSymbol(Character symbol);
-
-    /**
      * This character is used to denote the beginning of the user input area of the shell
      *
      * @return The PROMPTSYMBOL character
@@ -68,22 +54,4 @@ public interface Environment {
      * @param symbol The new PROMPTSYMBOL character
      */
     void setPromptSymbol(Character symbol);
-
-    /**
-     * If a command spans across multiple lines this character is used to denote each row after
-     * the first line.
-     * <p>
-     * The first line is denoted by the PROMPTSYMBOL character
-     *
-     * @return The MORELINESSYMBOL character
-     */
-    Character getMorelinesSymbol();
-
-    /**
-     * Used to set the MORELINESSYMBOL character
-     *
-     * @param symbol The new MORELINESSYMBOL character
-     */
-    void setMorelinesSymbol(Character symbol);
-
 }

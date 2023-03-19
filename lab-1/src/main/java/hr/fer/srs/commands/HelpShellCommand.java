@@ -1,8 +1,7 @@
-package hr.fer.zemris.java.hw06.shell.commands;
+package hr.fer.srs.commands;
 
-import hr.fer.zemris.java.hw06.shell.env.Environment;
-import hr.fer.zemris.java.hw06.shell.env.ShellStatus;
-import hr.fer.zemris.java.hw06.shell.util.Util;
+import hr.fer.srs.env.Environment;
+import hr.fer.srs.env.ShellStatus;
 
 import java.util.List;
 import java.util.Set;
@@ -21,9 +20,9 @@ public class HelpShellCommand implements ShellCommand {
 
     @Override
     public ShellStatus executeCommand(Environment env, String arguments) {
-        List<String> args = Util.parse(arguments);
+        List<String> args = List.of(arguments.split(" "));
 
-        if (args == null) {
+        if (args.get(0).equals("")) {
             Set<String> commandNames = env.commands().keySet();
 
             commandNames.forEach(env::writeln);

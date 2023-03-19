@@ -1,7 +1,7 @@
-package hr.fer.zemris.java.hw06.shell.commands;
+package hr.fer.srs.commands;
 
-import hr.fer.zemris.java.hw06.shell.env.Environment;
-import hr.fer.zemris.java.hw06.shell.env.ShellStatus;
+import hr.fer.srs.env.Environment;
+import hr.fer.srs.env.ShellStatus;
 
 import java.util.List;
 

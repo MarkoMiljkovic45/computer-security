@@ -1,4 +1,4 @@
-package hr.fer.zemris.java.hw06.shell.util.reader;
+package hr.fer.srs.util;
 
 import java.util.*;
 import java.util.function.Function;
