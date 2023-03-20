@@ -47,11 +47,4 @@ public interface Environment {
      * @return The PROMPTSYMBOL character
      */
     Character getPromptSymbol();
-
-    /**
-     * Used to set the PROMPTSYMBOL character
-     *
-     * @param symbol The new PROMPTSYMBOL character
-     */
-    void setPromptSymbol(Character symbol);
 }

@@ -9,13 +9,13 @@ import hr.fer.srs.util.StringReader;
 /**
  * Password Manager Application
  * <p>
- * It works like a console that supports 4 commands:
+ * It works like a console that supports the following commands:
  * <ul>
- *     <li>init [MASTER]                  - Initializes the master password</li>
- *     <li>get  [MASTER] [URL]            - Returns the password for a given web address</li>
- *     <li>put  [MASTER] [URL] [PASSWORD] - Sets a password for a given web address</li>
- *     <li>help [COMMAND]                 - Prints the manual for a certain command</li>
- *     <li>exit                           - Terminates the shell</li>
+ *     <li>init [MASTER]         - Initializes the master password, deletes saved passwords if present</li>
+ *     <li>get  [URL]            - Returns the password for a given web address</li>
+ *     <li>put  [URL] [PASSWORD] - Sets a password for a given web address</li>
+ *     <li>help [COMMAND]        - Prints the manual for a certain command</li>
+ *     <li>exit                  - Terminates the shell</li>
  * </ul>
  */
 public class PasswordManager {

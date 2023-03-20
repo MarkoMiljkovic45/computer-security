@@ -2,17 +2,13 @@ package hr.fer.srs.env;
 
 import hr.fer.srs.commands.*;
 
+import javax.crypto.spec.PBEKeySpec;
 import java.util.Collections;
 import java.util.Scanner;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 public class ShellEnvironment implements Environment {
-
-    /**
-     * Character denoting the beginning of the shells first user input line
-     */
-    private Character PROMPTSYMBOL;
 
     /**
      * Scanner used to read user input
@@ -27,11 +23,9 @@ public class ShellEnvironment implements Environment {
     /**
      * Master password used for encryption
      */
-    private String masterPassword;
+    private PBEKeySpec masterPassword;
 
     public ShellEnvironment() {
-        setPromptSymbol('>');
-
         try {
             envInputScanner = new Scanner(System.in);
         } catch (Exception e) {
@@ -39,11 +33,9 @@ public class ShellEnvironment implements Environment {
         }
 
         commands = new TreeMap<>();
-        commands.put("init", new InitShellCommand());
-        commands.put("put", new PutShellCommand());
-        commands.put("get", new GetShellCommand());
-        commands.put("help", new HelpShellCommand());
-        commands.put("exit", new ExitShellCommand());
+        initCommands();
+
+        initPasswords();
     }
 
     @Override
@@ -68,11 +60,18 @@ public class ShellEnvironment implements Environment {
 
     @Override
     public Character getPromptSymbol() {
-        return PROMPTSYMBOL;
+        return '>';
     }
 
-    @Override
-    public void setPromptSymbol(Character symbol) {
-        this.PROMPTSYMBOL = symbol;
+    private void initCommands() {
+        commands.put("init", new InitShellCommand());
+        commands.put("put", new PutShellCommand());
+        commands.put("get", new GetShellCommand());
+        commands.put("help", new HelpShellCommand());
+        commands.put("exit", new ExitShellCommand());
+    }
+
+    private void initPasswords() {
+
     }
 }
