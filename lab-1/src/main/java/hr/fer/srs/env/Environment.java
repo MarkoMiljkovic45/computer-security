@@ -51,6 +51,29 @@ public interface Environment {
     void writeToDatabase(String text) throws ShellIOException;
 
     /**
+     * Searches the database for an entry with a given key
+     * @param key used to search the entries
+     * @return true if entry found, false otherwise
+     * @throws ShellIOException If an IOException occurs
+     */
+    boolean containsDatabaseEntry(String key) throws ShellIOException;
+
+    /**
+     * Removes a database entry using a given key
+     * @param key used to search the entries
+     * @throws ShellIOException If an IOException occurs
+     */
+    void removeDatabaseEntry(String key) throws ShellIOException;
+
+    /**
+     * Returns a database entry using a given key
+     * @param key used to search the entry
+     * @return The database entry, or <code>null</code> if entry not found
+     * @throws ShellIOException If an IOException occurs
+     */
+    String getDatabaseEntry(String key) throws ShellIOException;
+
+    /**
      * Lists all available commands
      *
      * @return An unmodifiable map of command name and ShellCommand object pairs
@@ -85,7 +108,14 @@ public interface Environment {
     byte[] getAesIV();
 
     /**
-     *
+     * Sets the master password, generating new secret keys and creating a new database
+     * @param masterPassword new master password
      */
     void setMasterPassword(String masterPassword);
+
+    /**
+     * Used to initialize the secret keys
+     * @throws ShellIOException If an error occurs
+     */
+    void initSecretKeys() throws ShellIOException;
 }

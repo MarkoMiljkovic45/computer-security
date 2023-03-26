@@ -4,7 +4,11 @@ import hr.fer.srs.commands.ShellCommand;
 import hr.fer.srs.env.Environment;
 import hr.fer.srs.env.ShellEnvironment;
 import hr.fer.srs.env.ShellStatus;
-import hr.fer.srs.util.StringReader;
+import hr.fer.srs.util.reader.StringReader;
+
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 /**
  * Password Manager Application
@@ -19,20 +23,22 @@ import hr.fer.srs.util.StringReader;
  * </ul>
  */
 public class PasswordManager {
+    public static final Charset CHARSET      = StandardCharsets.UTF_8;
+    public static final int PASSWORD_LENGTH  = 256;
+    public static final int PASSWORD_PADDING = 16;
+
     public static void main(String[] args) {
-        System.out.println("Welcome to Password Manager v 1.0\n");
+        System.out.println("Welcome to Password Manager v1.0");
 
-        try {
-            ShellStatus status = ShellStatus.CONTINUE;
-            Environment env = new ShellEnvironment();
+        ShellStatus status = ShellStatus.CONTINUE;
 
-            while (status != ShellStatus.TERMINATE) {
-                env.write(env.getPromptSymbol() + " ");
-                String userInput = env.readLine();
-                status = executeCommand(env, userInput);
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        Environment env = new ShellEnvironment();
+        initEnvironment(env);
+
+        while (status != ShellStatus.TERMINATE) {
+            env.write(env.getPromptSymbol() + " ");
+            String userInput = env.readLine();
+            status = executeCommand(env, userInput);
         }
     }
 
@@ -65,5 +71,26 @@ public class PasswordManager {
         }
 
         return ShellStatus.CONTINUE;
+    }
+
+    private static void initEnvironment(Environment env) {
+        try {
+            env.initSecretKeys();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+
+            System.out.print("\nDo you want to initialize a new master password? WARNING: This will delete the previously stored passwords! Y/N: ");
+
+            Scanner sc = new Scanner(System.in);
+            String choice = sc.nextLine().toLowerCase();
+
+            if (choice.equals("y")) {
+                System.out.print("Enter new master password: ");
+                String newMasterPassword = sc.nextLine();
+                env.setMasterPassword(newMasterPassword);
+            } else {
+                System.exit(0);
+            }
+        }
     }
 }

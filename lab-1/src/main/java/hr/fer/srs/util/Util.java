@@ -1,5 +1,9 @@
 package hr.fer.srs.util;
 
+import hr.fer.srs.util.parser.ArgumentParser;
+
+import java.util.List;
+
 /**
  * A class containing static utility methods
  *
@@ -57,12 +61,30 @@ public class Util {
         StringBuilder sb = new StringBuilder();
 
         for (byte b: byteArray) {
-            if (b < 15 && b >= 0)
+            if (b <= 15 && b >= 0)
                 sb.append("0");
 
             sb.append(Integer.toHexString(Byte.toUnsignedInt(b)));
         }
 
         return sb.toString();
+    }
+
+    /**
+     * Used for parsing ShellCommand arguments
+     * <p>
+     * If an argument starts with a quotation character escaping is supported for " and \.
+     * Every other situation in which after \ follows anything but " and \ will be copied as two characters
+     *
+     * @param args String containing all arguments
+     * @return String array of individual arguments
+     */
+    public static List<String> parse(String args) {
+        if (args == null || args.equals("")) {
+            return null;
+        }
+
+        ArgumentParser parser = new ArgumentParser(args);
+        return parser.parse();
     }
 }

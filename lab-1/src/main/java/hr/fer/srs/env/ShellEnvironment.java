@@ -6,9 +6,8 @@ import hr.fer.srs.util.Util;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -18,6 +17,8 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.*;
+
+import static hr.fer.srs.PasswordManager.CHARSET;
 
 public class ShellEnvironment implements Environment {
 
@@ -56,15 +57,12 @@ public class ShellEnvironment implements Environment {
     private static final int ITERATION_COUNT = 65536;
     private static final int AES_KEY_LENGTH  = 128;
     private static final int HMAC_KEY_LENGTH = 512;
-    private static final Charset CHARSET     = StandardCharsets.UTF_8;
 
     public ShellEnvironment() {
         try {
             envInputScanner = new Scanner(System.in);
             commands = new TreeMap<>();
-
             initCommands();
-            initSecretKeys();
         } catch (Exception e) {
             throw new ShellIOException(e.getMessage());
         }
@@ -98,6 +96,50 @@ public class ShellEnvironment implements Environment {
     public void writeToDatabase(String text) throws ShellIOException {
         try {
             Files.writeString(DATABASE_PATH, text, CHARSET, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
+        } catch (Exception e) {
+            throw new ShellIOException(e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean containsDatabaseEntry(String key) throws ShellIOException {
+        try {
+            List<String> entries = Files.readAllLines(DATABASE_PATH);
+            return entries.stream().anyMatch(line -> line.startsWith(key));
+        } catch (Exception e) {
+            throw new ShellIOException(e.getMessage());
+        }
+    }
+
+    @Override
+    public void removeDatabaseEntry(String key) throws ShellIOException {
+        try {
+            List<String> entries = Files.readAllLines(DATABASE_PATH);
+            BufferedWriter writer = Files.newBufferedWriter(DATABASE_PATH, StandardOpenOption.TRUNCATE_EXISTING);
+
+            entries.stream()
+                    .filter(line -> !line.startsWith(key))
+                    .forEach(line -> {
+                        try {
+                            writer.write(line + "\n");
+                        } catch (IOException e) {
+                            throw new ShellIOException(e.getMessage());
+                        }
+                    });
+
+            writer.flush();
+            writer.close();
+        } catch (Exception e) {
+            throw new ShellIOException(e.getMessage());
+        }
+    }
+
+    @Override
+    public String getDatabaseEntry(String key) throws ShellIOException {
+        try {
+            List<String> entries = Files.readAllLines(DATABASE_PATH);
+            Optional<String> databaseEntry = entries.stream().filter(line -> line.startsWith(key)).findAny();
+            return databaseEntry.orElse(null);
         } catch (Exception e) {
             throw new ShellIOException(e.getMessage());
         }
@@ -155,11 +197,15 @@ public class ShellEnvironment implements Environment {
         commands.put("exit", new ExitShellCommand());
     }
 
-    private void initSecretKeys() throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
-        if (Files.exists(DATABASE_PATH)) {
-            loadMasterPassword();
-        } else {
-            initMasterPassword();
+    public void initSecretKeys() throws ShellIOException {
+        try {
+            if (Files.exists(DATABASE_PATH)) {
+                loadMasterPassword();
+            } else {
+                initMasterPassword();
+            }
+        } catch (Exception e) {
+            throw new ShellIOException(e.getMessage());
         }
     }
 
@@ -189,7 +235,8 @@ public class ShellEnvironment implements Environment {
     private void generateSecretKeys(String masterPassword) throws NoSuchAlgorithmException, InvalidKeySpecException {
         char[] masterPasswordCharArray = masterPassword.toCharArray();
 
-        SecureRandom random = new SecureRandom(masterPassword.getBytes(CHARSET));
+        SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+        random.setSeed(masterPassword.getBytes(CHARSET));
 
         byte[] hmacAddressSalt = new byte[16];
         byte[] hmacTokenSalt   = new byte[16];

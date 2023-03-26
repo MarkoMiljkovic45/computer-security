@@ -1,4 +1,4 @@
-package hr.fer.srs.util;
+package hr.fer.srs.util.reader;
 
 import java.util.*;
 import java.util.function.Function;
