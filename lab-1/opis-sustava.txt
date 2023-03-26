@@ -1,14 +1,19 @@
-Ako sustav prilikom pokretanja ne pronađe database.bin datoteku, znači da glavna zaporka još
+UKRATKO:
+SHA256(Masetr)
+a=HMAC(adresa, k1) b=AES(password + padding, k2) HMAC(a + b, k3)
+
+Derivirani ključevi su generirani koisteći SHA1PRNG seedan s bajtovima glavne zaporke (UTF-8)
+
+NADUGO:
+Ako sustav prilikom pokretanja ne pronađe database.txt datoteku, znači da glavna zaporka još
 nije postavljena i od korisnika se traži da unese novu glavnu zaporku.
 
-Ako datoteka dabase.bin postoji, od korisnika se traži da unese postojeću glavnu zaporku kako bi pristupio aplikaciji.
+Ako datoteka dabase.txt postoji, od korisnika se traži da unese postojeću glavnu zaporku kako bi pristupio aplikaciji.
 
-Glavna zaporka se provjerava na način da se u prvom redu database.bin datoteke nalazi šifrat poznatog teksta
-("MASTER"). Poznati tekst je šifriran simetrično pomoću AES128 korištenjem ključa deriviranog od glavne zaporke k1.
-Ukoliko dekripcija tog šifrata ne rezultira poznatim tekstom, glavna zaporka je kriva ili je integrite narušen.
+Glavna zaporka se provjerava na način da se u prvom redu database.txt datoteke nalazi SHA256 sažetak glavne zaporke.
+Ukoliko se sažetak unesene šifre ne poklapa sa spremljenim sažetkom, glavna zaporka je kriva ili je integrite narušen.
 
 Nakon što je unesena ispravna glavna zaporka, korisnik može nastaviti s korištenjem aplikacije.
-!!! Glavna zaporka se čuva samo u radnoj memoriji tijekom rada aplikacije, nikad se ne sprema na disk !!!
 
 Aplikacija se ponaša poput sučelja u komandnoj liniji s naredbama:
 
@@ -19,25 +24,23 @@ Aplikacija se ponaša poput sučelja u komandnoj liniji s naredbama:
     exit                  - Gasi aplikaciju
 
 Enkripcija zaporki:
-    1. Od glavne zaporke deriviramo dva nova ključa k1 i k2
-    2. Na URL web stranice i zadane zaporke dodamo naumično generirane znakove kako bi postigli
-       da su URL i zaporka duljine od 272 znaka. Nasumično generirani brojevi su od URL-a i
-       zaporke odvojeni razmakom
-    3. Zatim zasebno šifriramo URL i zaporku pomoću AES128 koristeći k1. Šifrat URL će se nalaziti
-       u prvom stupcu datoteke, a šifrat zaporke u drugom stupcu.
-    4. U treći stupac dolazi tag koji koristimo za provjeru integriteta. Tag se generira
-       tako da kroz funkciju sažetka HmacSHA256 koristeći k2 provučemo šifrat URL-a na
+    1. Od glavne zaporke deriviramo tri nova ključa k1, k2, k3 i inicijalizacijski vektor IV
+    2. Koristeći k1 i HmacSHA256 dobivamo sažetak URL-a web stranice koji će se nalaziti u prvom stupcu database.txt
+    2. Na zadanu zaporku dodamo naumično generirane znakove kako bi dopunili zaporku do duljine od 272 znaka.
+       Nasumično generirani brojevi su od zaporke odvojeni razmakom
+    3. Zatim šifriramo zaporku pomoću AES128, IV i k2. Dobiveni šifrat čini drugi stupac databse.txt
+    4. U treći stupac dolazi token koji koristimo za provjeru integriteta. Token se generira
+       tako da kroz funkciju sažetka HmacSHA256 koristeći k3 provučemo sažetak URL-a na
        koji smo dodali šifrat zaporke.
 
 Dohvat zaporke:
-    1. Od glavne zaporke deriviramo dva nova ključa k1 i k2
-    2. Prilikom dohvata zaporke prvo se provede postupak šifriranja URL-a pomoću AES128 koristeći k1.
-       Taj šifrat nam omogućuje da pronađemo redak u kojem se nalazi tražena zaporka u datoteci.
-    3. Nakon što pronađemo traženi redak, šifrate prvog i drugog stupca, sljepljene jedan na drugi,
-       provučemo kroz HmacSHA256 funkciju sažetka koristeći k2 kako bi dobiveni sažetak usporedili
-       s trećim stupcem koji nam služi kao provjera integriteta.
-    4. Ako je integritet potvrđen, koristi se k1 kako bi se dešifrirao šifrat drugog stupca koji
-       odgovara traženoj zaporci
+    1. Od glavne zaporke deriviramo tri nova ključa k1, k2, k3 i inicijalizacijski vektor IV
+    2. Prilikom dohvata zaporke prvo se izračuna HmacSHA256 sažetak URL-a koristeći k1.
+       Taj sažetak nam omogućuje da pronađemo redak u kojem se nalazi tražena zaporka u datoteci.
+    3. Nakon što pronađemo traženi redak, konkatenirani prvi i drugi stupac provučemo kroz HmacSHA256 funkciju
+       sažetka koristeći k3 kako bi dobiveni sažetak usporedili s trećim stupcem koji nam služi kao provjera integriteta.
+    4. Ako je integritet potvrđen, koristi se AES128, IV i k2 kako bi se dešifrirao šifrat drugog stupca koji
+       odgovara traženoj zaporci. Dodano punjenje se odbaci jer je odvojeno razmakom
 
 
 Sigurnosni zahtjevi:
@@ -47,11 +50,11 @@ Sigurnosni zahtjevi:
           zaporke biraju nasumično
 
     2. Povjerljivost adresa:
-        - Informacija o duljini zaštićena jer su sve adrese prije šifriranja produljene na 272 znakova.
+        - Informacija o adresi su zaštićene jer je provučena kroz funckiju sažetka.
 
     3. Integritet adresa i zaporki:
         - Nije moguće da korisnik dobije od alata zaporku za određenu adresu, ako prethodno
           nije unio točno tu zaporku za točno tu adresu jer se glavna zaporka provjerava prilikom
-          pokretanja progarama te je svaki par adresa zaporka zaštićen tagom za provjeru integriteta
+          pokretanja progarama te je svaki par adresa zaporka zaštićen tokenom za provjeru integriteta
           (HmacSHA256).
         - Iz istog razloga nije moguć ni napad zamjene
