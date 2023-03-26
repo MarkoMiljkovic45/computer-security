@@ -21,8 +21,7 @@ public class GetShellCommand implements ShellCommand {
     public List<String> getCommandDescription() {
         return List.of(new String[]
                 {"get - Returns the password for a given web address.\n",
-                 "get [MASTER] [URL]\n",
-                 "MASTER - Master password",
+                 "get [URL]\n",
                  "URL    - The website whose password you are retrieving"}
         );
     }

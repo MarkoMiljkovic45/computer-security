@@ -20,15 +20,19 @@ import hr.fer.srs.util.StringReader;
  */
 public class PasswordManager {
     public static void main(String[] args) {
-        System.out.println("Welcome to Password Manager v 1.0");
+        System.out.println("Welcome to Password Manager v 1.0\n");
 
-        ShellStatus status = ShellStatus.CONTINUE;
-        Environment env = new ShellEnvironment();
+        try {
+            ShellStatus status = ShellStatus.CONTINUE;
+            Environment env = new ShellEnvironment();
 
-        while (status != ShellStatus.TERMINATE) {
-            env.write(env.getPromptSymbol() + " ");
-            String userInput = env.readLine();
-            status = executeCommand(env, userInput);
+            while (status != ShellStatus.TERMINATE) {
+                env.write(env.getPromptSymbol() + " ");
+                String userInput = env.readLine();
+                status = executeCommand(env, userInput);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 

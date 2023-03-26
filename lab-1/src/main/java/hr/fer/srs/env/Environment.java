@@ -2,6 +2,8 @@ package hr.fer.srs.env;
 
 import hr.fer.srs.commands.ShellCommand;
 
+import javax.crypto.spec.SecretKeySpec;
+import java.util.List;
 import java.util.SortedMap;
 
 /**
@@ -35,6 +37,20 @@ public interface Environment {
     void writeln(String text) throws ShellIOException;
 
     /**
+     * Reads the environment database
+     * @return List of lines from the database
+     * @throws ShellIOException If an IOException occurs
+     */
+    List<String> readDatabase() throws ShellIOException;
+
+    /**
+     * Writes to the environment database
+     * @param text to be written to the database
+     * @throws ShellIOException If an IOException occurs
+     */
+    void writeToDatabase(String text) throws ShellIOException;
+
+    /**
      * Lists all available commands
      *
      * @return An unmodifiable map of command name and ShellCommand object pairs
@@ -47,4 +63,29 @@ public interface Environment {
      * @return The PROMPTSYMBOL character
      */
     Character getPromptSymbol();
+
+    /**
+     * @return Environment hmac key for password address encryption
+     */
+    SecretKeySpec getHmacAddressKey();
+
+    /**
+     * @return Environment hmac key for integrity token generation
+     */
+    SecretKeySpec getHmacTokenKey();
+
+    /**
+     * @return Environment AES128 key
+     */
+    SecretKeySpec getAesKey();
+
+    /**
+     * @return Environment AES128 initialization vector
+     */
+    byte[] getAesIV();
+
+    /**
+     *
+     */
+    void setMasterPassword(String masterPassword);
 }

@@ -21,8 +21,7 @@ public class PutShellCommand implements ShellCommand {
     public List<String> getCommandDescription() {
         return List.of(new String[]
                 {"put - Sets a password for a given web address.\n",
-                 "put [MASTER] [URL] [PASSWORD]\n",
-                 "MASTER   - Master password",
+                 "put [URL] [PASSWORD]\n",
                  "URL      - The website whose password you are setting",
                  "PASSWORD - The password for the website"}
         );
