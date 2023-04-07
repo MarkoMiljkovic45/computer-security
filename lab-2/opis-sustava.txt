@@ -1,9 +1,9 @@
 Struktura datoteke:
 
-SHA256(username) salt SHA256(password + salt) forcepass
+username salt SHA256(password + salt) forcepass
 
 salt = random 64 bits
-forcepass = 1 bit (true/false)
+forcepass = 1 char (0 ili 1)
 
 
 Zaštite lozinki s predavanja:

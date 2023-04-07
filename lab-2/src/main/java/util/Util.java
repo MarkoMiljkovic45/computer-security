@@ -1,3 +1,9 @@
+package util;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+
 public class Util {
 
     public static byte[] hexToByte(String keyText) {
@@ -31,5 +37,22 @@ public class Util {
         }
 
         return sb.toString();
+    }
+
+    public static byte[] generateSalt(int size) {
+        byte[] salt = new byte[size];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(salt);
+        return salt;
+    }
+
+    public static byte[] hashMessage(byte[] message) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            return digest.digest(message);
+        }
+        catch (NoSuchAlgorithmException ignore) {
+            return null;
+        }
     }
 }
