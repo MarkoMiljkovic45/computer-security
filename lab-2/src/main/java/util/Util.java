@@ -1,5 +1,7 @@
 package util;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -52,6 +54,19 @@ public class Util {
             return digest.digest(message);
         }
         catch (NoSuchAlgorithmException ignore) {
+            return null;
+        }
+    }
+
+    public static byte[] toByteArray(byte[]...arrays) {
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            for (byte[] arr: arrays) {
+                bos.write(arr);
+            }
+
+            return bos.toByteArray();
+        }
+        catch (IOException ignore) {
             return null;
         }
     }

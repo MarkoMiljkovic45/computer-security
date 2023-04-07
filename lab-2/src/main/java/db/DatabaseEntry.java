@@ -3,16 +3,14 @@ package db;
 import util.User;
 import util.Util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class DatabaseEntry {
 
-    private String username;
-    private byte[] salt;
-    private byte[] passwordHash;
+    private final String username;
+    private final byte[] salt;
+    private final byte[] passwordHash;
     private boolean forcepass;
 
     private static final int SALT_SIZE = 64;
@@ -38,23 +36,32 @@ public class DatabaseEntry {
         this(entry.split(" "));
     }
 
-    public DatabaseEntry(User user, boolean forcepass) {
-        try {
-            this.username = user.username();
-            this.salt = Util.generateSalt(SALT_SIZE);
+    public String getUsername() {
+        return username;
+    }
 
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            bos.write(user.password().getBytes(CHARSET));
-            bos.write(salt);
+    public byte[] getSalt() {
+        return salt;
+    }
 
-            this.passwordHash = Util.hashMessage(bos.toByteArray());
-            this.forcepass = forcepass;
-        }
-        catch (IOException ignore) {}
+    public byte[] getPasswordHash() {
+        return passwordHash;
+    }
+
+    public boolean isForcepass() {
+        return forcepass;
     }
 
     public void setForcepass(boolean forcepass) {
         this.forcepass = forcepass;
+    }
+
+    public static DatabaseEntry createFromUser(User user, boolean forcepass) {
+        String username = user.username();
+        byte[] salt = Util.generateSalt(SALT_SIZE);
+        byte[] saltedPassword = Util.toByteArray(user.password().getBytes(CHARSET), salt);
+        byte[] passwordHash = Util.hashMessage(saltedPassword);
+        return new DatabaseEntry(username, salt, passwordHash, forcepass);
     }
 
     @Override

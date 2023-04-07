@@ -46,8 +46,14 @@ public class Database {
     }
 
     public static void addEntry(User user, boolean forcepass) throws IOException {
-        String line = new DatabaseEntry(user, forcepass).toString();
-        Files.write(DATABASE_PATH, List.of(line), CHARSET, StandardOpenOption.APPEND, StandardOpenOption.CREATE);
+        DatabaseEntry entry = DatabaseEntry.createFromUser(user, forcepass);
+
+        Files.write(DATABASE_PATH,
+                List.of(entry.toString()),
+                CHARSET,
+                StandardOpenOption.APPEND,
+                StandardOpenOption.CREATE
+        );
     }
 
     public static void addEntry(User user) throws IOException {
@@ -78,7 +84,20 @@ public class Database {
     }
 
     public static DatabaseEntry getEntry(String username) throws IOException {
-        //TODO Check if file exists
+        if (!Files.exists(DATABASE_PATH)) {
+            return null;
+        }
+
+        Scanner scanner = new Scanner(DATABASE_PATH);
+
+        while(scanner.hasNext()) {
+            String line = scanner.nextLine();
+
+            if (line.startsWith(username)) {
+                return new DatabaseEntry(line);
+            }
+        }
+
         return null;
     }
 }
