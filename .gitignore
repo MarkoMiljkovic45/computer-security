@@ -11,6 +11,7 @@ target/
 
 !diskusija.txt
 !opis-sustava.txt
+!report.txt
 
 ### IntelliJ IDEA ###
 .idea
