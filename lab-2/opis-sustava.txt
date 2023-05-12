@@ -1,0 +1,26 @@
+Struktura datoteke:
+
+username salt SHA256(password + salt) forcepass
+
+salt = random 64 bits
+forcepass = 1 char (0 ili 1)
+
+
+Zaštite lozinki s predavanja:
+
+• Ispravno ih pohranjivati
+    Implementirano: Pretpostavka je da napadač može doći do datoteke s lozinkama stoga ju je potrebno
+                    zaštititi
+
+• Trebaju biti odgovarajuće kompleksnosti i često se mijenjati
+    Implementirano: Od korisnika se traži da se unesena lozinka sastoji od barem 8 znakova.
+                    Administrator može natjerati korisnike da mijenjaju lozinke
+
+• Spriječiti pogađanje
+    Nije implementirano: Pretpostavka je da će alat koristiti samo legitimni korisnici
+
+• Tijekom unosa paziti da ih netko ne otkrije
+    Implementirano: Unos lozinke u konzolu je skriven
+
+• Zaštititi tijekom prijenosa
+    Nije implementirano: Nije u opsegu zadatka pošto ovo nije mrežna aplikacija
